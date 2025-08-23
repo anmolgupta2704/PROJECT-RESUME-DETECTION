@@ -1,3 +1,6 @@
 streamlit
-sentence-transformers
-pdfplumber
+pandas
+rapidfuzz
+PyPDF2
+requests
+beautifulsoup4

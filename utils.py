@@ -1,8 +1,14 @@
-import fitz 
+from PyPDF2 import PdfReader
 
-def extract_text_from_pdf(uploaded_file):
-    text = ""
-    with fitz.open(stream=uploaded_file.read(), filetype="pdf") as doc:
-        for page in doc:
-            text += page.get_text()
-    return text
+def extract_text_from_pdf(file):
+    """Extracts all text from a PDF file"""
+    try:
+        reader = PdfReader(file)
+        text = ""
+        for page in reader.pages:
+            content = page.extract_text()
+            if content:
+                text += content + "\n"
+        return text.strip()
+    except Exception as e:
+        return f"Error reading PDF: {str(e)}"
