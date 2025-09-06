@@ -36,7 +36,7 @@
 
 ---
 
-## 🖼 App Preview
+<!--## 🖼 App Preview
 
 **1️⃣ Dashboard with Domain Selection & File Upload**  
 ![Dashboard](screenshots/dashboard.png)  
@@ -48,6 +48,7 @@
 ![Template Preview](screenshots/template_preview.png)  
 
 ---
+-->
 
 ## 📂 File Structure
 
