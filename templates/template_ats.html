@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        h1 { text-align: center; margin-bottom: 5px; }
+        h2 { border-bottom: 2px solid #000; padding-bottom: 4px; margin-top: 20px; }
+        p, li { font-size: 14px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+    <h1>{{ name }}</h1>
+    <p style="text-align:center;">{{ email }} | {{ phone }}</p>
+
+    <h2>Summary</h2>
+    <p>{{ summary }}</p>
+
+    <h2>Skills</h2>
+    <ul>
+      {% for skill in skills %}
+        <li>{{ skill }}</li>
+      {% endfor %}
+    </ul>
+
+    <h2>Experience</h2>
+    <ul>
+      {% for exp in experience %}
+        <li>{{ exp }}</li>
+      {% endfor %}
+    </ul>
+
+    <h2>Education</h2>
+    <ul>
+      {% for edu in education %}
+        <li>{{ edu }}</li>
+      {% endfor %}
+    </ul>
+
+    <h2>Projects</h2>
+    <ul>
+      {% for proj in projects %}
+        <li>{{ proj }}</li>
+      {% endfor %}
+    </ul>
+</body>
+</html>

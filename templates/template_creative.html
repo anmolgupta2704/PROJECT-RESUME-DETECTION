@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Helvetica Neue', sans-serif; margin: 40px; background: #f9f9f9; }
+        .header { text-align: center; background: #0366d6; color: white; padding: 20px; border-radius: 8px; }
+        .header h1 { margin: 0; }
+        .section { margin-top: 25px; background: white; padding: 15px 20px; border-radius: 6px; box-shadow: 0px 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #0366d6; margin-bottom: 8px; }
+        ul { margin: 0; padding-left: 20px; }
+        li { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ name }}</h1>
+        <p>{{ email }} | {{ phone }}</p>
+    </div>
+
+    <div class="section">
+        <h2>✨ Summary</h2>
+        <p>{{ summary }}</p>
+    </div>
+
+    <div class="section">
+        <h2>🛠 Skills</h2>
+        <ul>
+          {% for skill in skills %}
+            <li>{{ skill }}</li>
+          {% endfor %}
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>💼 Experience</h2>
+        <ul>
+          {% for exp in experience %}
+            <li>{{ exp }}</li>
+          {% endfor %}
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>🎓 Education</h2>
+        <ul>
+          {% for edu in education %}
+            <li>{{ edu }}</li>
+          {% endfor %}
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>🚀 Projects</h2>
+        <ul>
+          {% for proj in projects %}
+            <li>{{ proj }}</li>
+          {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

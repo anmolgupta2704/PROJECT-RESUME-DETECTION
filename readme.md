@@ -1,36 +1,69 @@
 # 📄 Smart Resume Analyzer (Domain-Based ATS)
 
-This is a Streamlit-based **Smart Resume Analyzer** tool built for academic or portfolio use. It allows users to:
+[![Python](https://img.shields.io/badge/Python-3.13-blue)](https://www.python.org/)  
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.26.1-orange)](https://streamlit.io/)  
+[![ATS Score](https://img.shields.io/badge/ATS-Ready-green)](https://en.wikipedia.org/wiki/Applicant_tracking_system)  
 
-✅ Select their career domain  
-✅ Upload their resume (PDF or TXT)  
-✅ Automatically match their skills with the **required skills** for that domain  
-✅ See an **ATS (Applicant Tracking System) score**  
-✅ Download a CSV report with matched and missing skills
+**Smart Resume Analyzer** is a **Streamlit-based AI-powered resume tool** that helps users:
 
----
-
-## 🚀 Features
-
-- Manual **domain selection** (Data Science, Web Dev, ML, etc.)
-- Extracts text from PDF or TXT resume
-- Matches your skills against a **predefined skill set**
-- Displays:
-  - ✅ Matched skills
-  - ⚠️ Missing skills
-  - 📊 ATS Score
-- Downloadable CSV report
+- Improve resumes
+- Match domain-specific skills
+- Generate professional PDFs with selectable templates
 
 ---
 
-## 🧠 How Skill Matching Works
+## 🚀 Key Features
 
-- A set of **important skills** for each domain is defined manually
-- Your resume is scanned and matched against those using fuzzy logic
-- Based on matches, an ATS score is calculated
-- Suggestions for improvement are shown
+- **Domain Selection:** Data Science, Web Development, Machine Learning, DevOps, Android Development, Software Engineering  
+- **Resume Upload:** PDF or TXT files  
+- **Skill Matching:** Fuzzy logic matches your resume against trending skills in your domain  
+- **ATS Score:** Calculates a percentage showing resume optimization  
+- **Resume Enhancement:** AI-enhanced experience bullet points  
+- **Template Selection & PDF Download:** Choose from ATS, Modern, or Creative templates  
+- **Downloadable Reports:** CSV of matched/missing skills and PDF resume  
 
 ---
+
+## 🧠 How It Works
+
+1. User selects their **career domain**  
+2. Uploads their **resume (PDF or TXT)**  
+3. The app **extracts text** from the resume  
+4. **Matches skills** against domain-specific trending skills  
+5. Calculates **ATS Score**  
+6. Displays **matched and missing skills**, with AI-enhanced improvement suggestions  
+7. User can **preview the resume** in a selected template and download it as PDF  
+
+---
+
+## 🖼 App Preview
+
+**1️⃣ Dashboard with Domain Selection & File Upload**  
+![Dashboard](screenshots/dashboard.png)  
+
+**2️⃣ Skills Analysis & ATS Score**  
+![ATS Score](screenshots/ats_score.png)  
+
+**3️⃣ Template Preview & Download**  
+![Template Preview](screenshots/template_preview.png)  
+
+---
+
+## 📂 File Structure
+
+```bash
+PROJECT_RESUME_DETECTION/
+├── app.py                  # Streamlit app
+├── utils.py                # Helper functions (PDF parsing, AI enhancement, PDF rendering)
+├── templates/              # HTML templates
+│   ├── template_ats.html
+│   ├── template_modern.html
+│   └── template_creative.html
+├── requirements.txt        # Python dependencies
+├── screenshots/            # Placeholder for app screenshots
+└── README.md               # This file
+```
+
 
 ## 📁 How to Run
 
@@ -58,12 +91,3 @@ streamlit run app.py
 ```bash
 Open browser at http://localhost:8501
 ```
-📝 File Structure
-Now just make sure your folder includes:
-
-```bash
-📁 PROJECT RESUME DETECTION
-├── app.py
-├── utils.py
-├── requirements.txt
-└── README.md

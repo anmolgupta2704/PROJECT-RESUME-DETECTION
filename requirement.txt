@@ -1,6 +1,6 @@
 streamlit
-pandas
-rapidfuzz
 PyPDF2
-requests
-beautifulsoup4
+jinja2
+pdfkit
+rapidfuzz
+pandas
