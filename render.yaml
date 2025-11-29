@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: smart-resume-analyzer
+    env: python
+    plan: free
+    buildCommand: |
+      apt-get update && apt-get install -y wkhtmltopdf
+      pip install -r requirements.txt
+    startCommand: "streamlit run app.py --server.port=$PORT --server.address=0.0.0.0"
