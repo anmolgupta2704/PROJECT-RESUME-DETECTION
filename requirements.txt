@@ -1,0 +1,15 @@
+streamlit==1.38.0
+pandas==2.2.2
+rapidfuzz==3.8.1
+python-dotenv==1.0.1
+jinja2==3.1.4
+PyPDF2==3.0.1
+pdfkit==1.0.0
+google-genai==1.52.0
+requests==2.31.0
+tqdm==4.66.1
+typing-extensions==4.9.0
+anyio==4.2.0
+websockets==12.0
+pydantic==2.6.3
+google-auth==2.29.0

@@ -1,6 +1,0 @@
-streamlit
-PyPDF2
-jinja2
-pdfkit
-rapidfuzz
-pandas
