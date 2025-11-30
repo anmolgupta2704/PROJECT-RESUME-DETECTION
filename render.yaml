@@ -2,6 +2,6 @@ services:
   - type: web
     name: smart-resume-analyzer
     env: python
-    runtime: python-3.10
-    buildCommand: pip install -r requirements.txt
-    startCommand: streamlit run app.py --server.port $PORT --server.address 0.0.0.0
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "streamlit run app.py --server.port=$PORT --server.address=0.0.0.0"
+    pythonVersion: "3.10.12"
