@@ -9,7 +9,7 @@ google-genai==1.52.0
 requests==2.31.0
 tqdm==4.66.1
 typing-extensions==4.9.0
-anyio==4.2.0
+anyio>=4.8.0,<5.0.0
 websockets==12.0
 pydantic==2.6.3
 google-auth==2.29.0
