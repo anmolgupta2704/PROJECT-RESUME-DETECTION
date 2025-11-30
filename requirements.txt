@@ -8,7 +8,7 @@ pdfkit==1.0.0
 google-genai==1.52.0
 requests==2.31.0
 tqdm==4.66.1
-typing-extensions==4.9.0
+typing-extensions==4.12.2
 anyio>=4.8.0,<5.0.0
 websockets==13.0
 pydantic==2.9.2
