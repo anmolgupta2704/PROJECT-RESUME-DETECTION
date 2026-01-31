@@ -22,7 +22,8 @@
 - **Template Selection & PDF Download:** Choose from ATS, Modern, or Creative templates  
 - **Downloadable Reports:** CSV of matched/missing skills and PDF resume  
 
----
+---   
+
 
 ## 🧠 How It Works
 
