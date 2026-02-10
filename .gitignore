@@ -1,2 +1,6 @@
 # .gitignore
 .env
+.venv
+__pycache__/
+.vscode/
+.streamlit/

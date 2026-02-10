@@ -9,39 +9,40 @@ from google import genai
 
 load_dotenv()
 
-# Create Gemini client (new SDK)
+# Gemini client
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 # Load templates
 env = Environment(loader=FileSystemLoader("templates"))
 
-# wkhtmltopdf configuration
-config = pdfkit.configuration(
-    wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
-)
+# wkhtmltopdf path (Windows local + Linux Render)
+WKHTML_PATH = os.getenv("WKHTMLTOPDF_PATH")
+
+if not WKHTML_PATH:
+    # Fallbacks
+    if os.name == "nt":  # Windows
+        WKHTML_PATH = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+    else:  # Linux (Render)
+        WKHTML_PATH = "/usr/bin/wkhtmltopdf"
+
+config = pdfkit.configuration(wkhtmltopdf=WKHTML_PATH)
 
 # ---------------------------------------------------
 
 
 def extract_text_from_pdf(file):
-    """Extract readable text from PDF."""
     try:
         reader = PdfReader(file)
         text = ""
-
         for page in reader.pages:
             content = page.extract_text()
             if content:
                 text += content + "\n"
-
         return text.strip()
     except Exception as e:
         return f"Error reading PDF: {str(e)}"
 
 
-
-
-# ------------------------ RESUME RENDER ------------------------
 def enhance_experience_with_ai(experience_text):
     if not experience_text.strip():
         return ""
@@ -64,13 +65,11 @@ def enhance_experience_with_ai(experience_text):
 
 
 def render_resume_pdf(resume_data, template_choice="ats", preview=False):
-    """Render resume HTML or convert to PDF."""
     try:
         template = env.get_template(f"template_{template_choice}.html")
-        html_content = template.render(resume_data)
+        html_content = template.render(**resume_data)
 
         if preview:
-            # For Streamlit preview
             return html_content
 
         options = {
@@ -85,7 +84,6 @@ def render_resume_pdf(resume_data, template_choice="ats", preview=False):
             options=options,
             configuration=config
         )
-
         return pdf_bytes
 
     except Exception as e:
@@ -104,5 +102,4 @@ domain_skill_map = {
 }
 
 def get_latest_skills(domain):
-    """Returns skills for selected domain."""
     return domain_skill_map.get(domain, [])
