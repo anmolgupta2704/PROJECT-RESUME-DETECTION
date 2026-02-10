@@ -3,14 +3,19 @@ from PyPDF2 import PdfReader
 from jinja2 import Environment, FileSystemLoader
 import pdfkit
 from dotenv import load_dotenv
-from google import genai
+import google.generativeai as genai
 
 # ------------------ CONFIGURATION ------------------
 
 load_dotenv()
 
-# Gemini client
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+# Gemini setup (stable SDK)
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+if not GOOGLE_API_KEY:
+    raise ValueError("GOOGLE_API_KEY not found in environment variables")
+
+genai.configure(api_key=GOOGLE_API_KEY)
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 # Load templates
 env = Environment(loader=FileSystemLoader("templates"))
@@ -19,11 +24,13 @@ env = Environment(loader=FileSystemLoader("templates"))
 WKHTML_PATH = os.getenv("WKHTMLTOPDF_PATH")
 
 if not WKHTML_PATH:
-    # Fallbacks
     if os.name == "nt":  # Windows
         WKHTML_PATH = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
     else:  # Linux (Render)
         WKHTML_PATH = "/usr/bin/wkhtmltopdf"
+
+if not os.path.exists(WKHTML_PATH):
+    print(f"⚠️ wkhtmltopdf not found at {WKHTML_PATH}. PDF export may fail.")
 
 config = pdfkit.configuration(wkhtmltopdf=WKHTML_PATH)
 
@@ -31,6 +38,7 @@ config = pdfkit.configuration(wkhtmltopdf=WKHTML_PATH)
 
 
 def extract_text_from_pdf(file):
+    """Extract readable text from PDF."""
     try:
         reader = PdfReader(file)
         text = ""
@@ -43,7 +51,8 @@ def extract_text_from_pdf(file):
         return f"Error reading PDF: {str(e)}"
 
 
-def enhance_experience_with_ai(experience_text):
+def enhance_experience_with_ai(experience_text: str) -> str:
+    """Enhance resume experience using Gemini AI."""
     if not experience_text.strip():
         return ""
 
@@ -55,16 +64,14 @@ def enhance_experience_with_ai(experience_text):
     """
 
     try:
-        response = client.models.generate_content(
-            model="models/gemini-flash-latest",
-            contents=prompt
-        )
+        response = model.generate_content(prompt)
         return response.text
     except Exception as e:
         return f"⚠️ AI Enhancement Error: {str(e)}"
 
 
 def render_resume_pdf(resume_data, template_choice="ats", preview=False):
+    """Render resume HTML or convert to PDF using wkhtmltopdf."""
     try:
         template = env.get_template(f"template_{template_choice}.html")
         html_content = template.render(**resume_data)
@@ -75,7 +82,11 @@ def render_resume_pdf(resume_data, template_choice="ats", preview=False):
         options = {
             "page-size": "A4",
             "encoding": "UTF-8",
-            "enable-local-file-access": ""
+            "enable-local-file-access": "",
+            "margin-top": "10mm",
+            "margin-bottom": "10mm",
+            "margin-left": "10mm",
+            "margin-right": "10mm",
         }
 
         pdf_bytes = pdfkit.from_string(
@@ -101,5 +112,6 @@ domain_skill_map = {
     "Software Engineering": ["OOP", "Data Structures", "Algorithms", "Git", "C++", "Java"],
 }
 
-def get_latest_skills(domain):
+def get_latest_skills(domain: str):
+    """Returns skills for selected domain."""
     return domain_skill_map.get(domain, [])
