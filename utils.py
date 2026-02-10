@@ -3,19 +3,18 @@ from PyPDF2 import PdfReader
 from jinja2 import Environment, FileSystemLoader
 import pdfkit
 from dotenv import load_dotenv
-import google.generativeai as genai
+from google import genai
 
 # ------------------ CONFIGURATION ------------------
 
 load_dotenv()
 
-# Gemini setup (stable SDK)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 if not GOOGLE_API_KEY:
     raise ValueError("GOOGLE_API_KEY not found in environment variables")
 
-genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash")
+# New Gemini SDK client (works on Render)
+client = genai.Client(api_key=GOOGLE_API_KEY)
 
 # Load templates
 env = Environment(loader=FileSystemLoader("templates"))
@@ -28,9 +27,6 @@ if not WKHTML_PATH:
         WKHTML_PATH = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
     else:  # Linux (Render)
         WKHTML_PATH = "/usr/bin/wkhtmltopdf"
-
-if not os.path.exists(WKHTML_PATH):
-    print(f"⚠️ wkhtmltopdf not found at {WKHTML_PATH}. PDF export may fail.")
 
 config = pdfkit.configuration(wkhtmltopdf=WKHTML_PATH)
 
@@ -64,7 +60,10 @@ def enhance_experience_with_ai(experience_text: str) -> str:
     """
 
     try:
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model="models/gemini-flash-latest",
+            contents=prompt
+        )
         return response.text
     except Exception as e:
         return f"⚠️ AI Enhancement Error: {str(e)}"
@@ -113,5 +112,4 @@ domain_skill_map = {
 }
 
 def get_latest_skills(domain: str):
-    """Returns skills for selected domain."""
     return domain_skill_map.get(domain, [])

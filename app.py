@@ -1,21 +1,9 @@
 import streamlit as st
 import pandas as pd
 from rapidfuzz import fuzz
-from utils import extract_text_from_pdf, render_resume_pdf
+from utils import extract_text_from_pdf, render_resume_pdf, enhance_experience_with_ai
 from web_scraper import get_latest_skills
 import streamlit.components.v1 as components
-from dotenv import load_dotenv
-from google import genai
-import os
-
-# ---------------- Load Environment & Gemini Setup ----------------
-load_dotenv()
-api_key = os.getenv("GOOGLE_API_KEY")
-
-if not api_key:
-    st.error("⚠️ GOOGLE_API_KEY not found in .env file")
-else:
-    client = genai.Client(api_key=api_key)
 
 # ---------------- Page Configuration ----------------
 st.set_page_config(
@@ -84,36 +72,12 @@ def ai_suggestions(missing_skills, domain):
     - Projects to prove these skills
     """
 
+    # Use the same AI enhancer function to keep SDK consistent
     try:
-        response = client.models.generate_content(
-            model="models/gemini-flash-latest",
-            contents=prompt
-        )
-        return response.text
+        tips = enhance_experience_with_ai(prompt)
+        return tips
     except Exception as e:
         return f"⚠️ AI Suggestion Error: {str(e)}"
-
-
-# ---------------- AI Enhance Experience ----------------
-def enhance_experience_with_ai(experience_text):
-    if not experience_text.strip():
-        return ""
-
-    prompt = f"""
-    Rewrite the following resume experience to make it professional, ATS-optimized,
-    bullet-point based, and action-driven:
-
-    {experience_text}
-    """
-
-    try:
-        response = client.models.generate_content(
-            model="models/gemini-flash-latest",
-            contents=prompt
-        )
-        return response.text
-    except Exception as e:
-        return f"⚠️ AI Enhancement Error: {str(e)}"
 
 # ---------------- Skill Analyzer Page ----------------
 if tab == "🧠 Skill Analyzer":
@@ -122,7 +86,6 @@ if tab == "🧠 Skill Analyzer":
     uploaded = st.file_uploader("Upload Your Resume", type=["pdf", "txt"])
 
     if uploaded:
-        # Extract text
         resume_text = (
             extract_text_from_pdf(uploaded)
             if uploaded.type == "application/pdf"
