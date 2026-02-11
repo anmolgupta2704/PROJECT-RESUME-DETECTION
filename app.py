@@ -1,32 +1,67 @@
 import streamlit as st
-import pandas as pd
 from rapidfuzz import fuzz
 from utils import extract_text_from_pdf, render_resume_pdf, enhance_experience_with_ai
 from web_scraper import get_latest_skills
 import streamlit.components.v1 as components
+from auth import require_login_if_needed, google_login_button, register_user, login_user, logout
+from db import init_db
+from history import save_resume_history, get_resume_history
+
+# ---------------- Init DB ----------------
+init_db()
 
 # ---------------- Page Configuration ----------------
-st.set_page_config(
-    page_title="Resume Builder & Skill Analyzer",
-    layout="wide",
-    page_icon="📄"
-)
+st.set_page_config(page_title="Resume Builder & Skill Analyzer", layout="wide", page_icon="📄")
 
-# ---------------- Sidebar Settings ----------------
+# ---------------- Login Gate ----------------
+if not require_login_if_needed():
+    st.title("🔐 Login Required")
+
+    tab1, tab2 = st.tabs(["Google Login", "Email Login / Register"])
+
+    with tab1:
+        google_login_button()
+
+    with tab2:
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Register"):
+                if not email or not password:
+                    st.error("Email and password required")
+                else:
+                    ok, msg = register_user(email, password)
+                    if ok:
+                        st.success(msg)
+                    else:
+                        st.error(msg)
+        with col2:
+            if st.button("Login"):
+                if login_user(email, password):
+                    st.session_state.user = email
+                    st.success("Logged in successfully!")
+                    st.rerun()
+                else:
+                    st.error("Invalid credentials")
+
+    st.stop()
+
+# ---------------- Sidebar ----------------
 st.sidebar.title("⚙️ Settings")
+
+if "user" in st.session_state:
+    st.sidebar.markdown(f"👤 Logged in as: **{st.session_state.user}**")
+    if st.sidebar.button("🚪 Logout"):
+        logout()
 
 domain = st.sidebar.selectbox(
     "Choose Domain",
-    [
-        "Web Development", "Data Science", "Machine Learning",
-        "Android Development", "DevOps", "Software Engineering"
-    ]
+    ["Web Development", "Data Science", "Machine Learning", "Android Development", "DevOps", "Software Engineering"],
 )
 
-threshold = st.sidebar.slider(
-    "Skill Match Sensitivity (%)", 60, 100, 80, step=5
-)
-
+threshold = st.sidebar.slider("Skill Match Sensitivity (%)", 60, 100, 80, step=5)
 show_tips = st.sidebar.checkbox("💡 Show Resume Improvement Tips (AI)", value=True)
 
 # Fetch skills
@@ -43,10 +78,10 @@ st.sidebar.markdown(
     unsafe_allow_html=True,
 )
 
-# ---------------- Navigation Tabs ----------------
-tab = st.sidebar.radio("Go To", ["🧠 Skill Analyzer", "📄 Resume Builder"])
+# ---------------- Navigation ----------------
+tab = st.sidebar.radio("Go To", ["🧠 Skill Analyzer", "📄 Resume Builder", "👤 Profile"])
 
-# ---------------- Helper Functions ----------------
+# ---------------- Helpers ----------------
 def fuzzy_match(skill, text, threshold=80):
     return fuzz.partial_ratio(skill.lower(), text.lower()) >= threshold
 
@@ -79,24 +114,17 @@ def ai_suggestions(missing_skills, domain):
     except Exception as e:
         return f"⚠️ AI Suggestion Error: {str(e)}"
 
-# ---------------- Skill Analyzer Page ----------------
+# ---------------- Skill Analyzer ----------------
 if tab == "🧠 Skill Analyzer":
     st.title("🧠 Resume Skill Analyzer")
-
     uploaded = st.file_uploader("Upload Your Resume", type=["pdf", "txt"])
 
     if uploaded:
-        resume_text = (
-            extract_text_from_pdf(uploaded)
-            if uploaded.type == "application/pdf"
-            else uploaded.read().decode("utf-8")
-        )
-
+        resume_text = extract_text_from_pdf(uploaded) if uploaded.type == "application/pdf" else uploaded.read().decode("utf-8")
         matched, missing = match_resume_with_skills(resume_text, live_skills, threshold)
         score = calculate_score(matched, live_skills)
 
         st.metric("ATS Skill Score", f"{score}%")
-
         st.markdown("### ✅ Matched Skills")
         st.markdown(
             " ".join([
@@ -116,15 +144,19 @@ if tab == "🧠 Skill Analyzer":
             ]),
             unsafe_allow_html=True
         )
-
         if show_tips:
             with st.expander("💡 AI-Based Resume Improvement Tips"):
                 st.markdown(ai_suggestions(missing, domain))
 
-# ---------------- Resume Builder Page ----------------
+        # Save history for logged in users
+        if "user" in st.session_state:
+            save_resume_history(st.session_state.user, domain, score)
+
+        st.session_state.usage_count = st.session_state.get("usage_count", 0) + 1
+
+# ---------------- Resume Builder ----------------
 elif tab == "📄 Resume Builder":
     st.title("📄 ATS Resume Builder")
-
     left, right = st.columns([1, 1.2])
 
     with left:
@@ -158,7 +190,6 @@ elif tab == "📄 Resume Builder":
 
     if submitted:
         exp_text = enhance_experience_with_ai(experience) if enhance else experience
-
         resume_data = {
             "name": name,
             "email": email,
@@ -182,3 +213,17 @@ elif tab == "📄 Resume Builder":
                 file_name=f"{name.replace(' ','_')}_resume.pdf",
                 mime="application/pdf",
             )
+# ---------------- Profile Page ----------------
+elif tab == "👤 Profile":
+    st.title("👤 My Profile")
+
+    st.markdown(f"**Email:** {st.session_state.get('user')}")
+
+    st.subheader("📜 Resume Check History")
+    rows = get_resume_history(st.session_state.get("user"))
+
+    if not rows:
+        st.info("No resume checks yet.")
+    else:
+        for domain, score, created_at in rows:
+            st.markdown(f"- **{domain}** | ATS Score: **{score}%** | {created_at}")

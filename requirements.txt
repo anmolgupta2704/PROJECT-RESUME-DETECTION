@@ -8,3 +8,6 @@ pdfkit
 pandas
 google-genai>=0.3.0
 
+bcrypt
+google-auth
+google-auth-oauthlib
